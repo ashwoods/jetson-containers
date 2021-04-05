@@ -1,0 +1,4 @@
+# short-description: Create SD card image
+# long-description: Creates an SD card image with a single EXT4 partition for FS.
+
+part / --source rootfs --ondisk mmcblk2 --fstype=ext4 --label root --align 4

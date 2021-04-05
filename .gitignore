@@ -1,0 +1,4 @@
+build/
+poky/
+meta-*/
+!meta-jetsoncontainers

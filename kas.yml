@@ -1,0 +1,59 @@
+header:
+  version: 2
+
+machine: jetson-tx2-devkit
+distro: jetsoncontainers
+target: core-image-minimal
+
+repos:
+  poky:
+    url: https://git.yoctoproject.org/git/poky
+    # dunfell release 3.1.6 LTS
+    refspec: refs/tags/yocto-3.1.6
+    layers:
+      meta:
+      meta-poky:
+      meta-yocto-bsp:
+
+  meta-tegra:
+    url: https://github.com/OE4T/meta-tegra
+    # dunfell-l4t-32.5.0 Jetpack release 4.5 on Mar 25, 2021
+    refspec: 7af5939b163fe0357c1c18a417c16b70a1c0dadd
+
+  meta-jetsoncontainers:
+    layers:
+      meta-jetsoncontainers:
+
+bblayers_conf_header:
+  standard: |
+    POKY_BBLAYERS_CONF_VERSION = "2"
+    BBPATH = "${TOPDIR}"
+    BBFILES ?= ""
+
+local_conf_header:
+    standard: |
+      CONF_VERSION = "1"
+      CORE_IMAGE_EXTRA_INSTALL += "i2c-tools kernel-modules"
+      PACKAGE_CLASSES = "package_rpm"
+      USER_CLASSES = "buildstats image-mklibs image-prelink"
+
+    tegra: |
+      IMAGE_CLASSES += "image_types_tegra"
+      IMAGE_FSTYPES = "tegraflash tar.gz wic.gz"
+
+    debug-tweaks: |
+      EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
+   
+    diskmon: |
+      BB_DISKMON_DIRS = "\
+        STOPTASKS,${TMPDIR},1G,100K \
+        STOPTASKS,${DL_DIR},1G,100K \
+        STOPTASKS,${SSTATE_DIR},1G,100K \
+        STOPTASKS,/tmp,100M,100K \
+        ABORT,${TMPDIR},100M,1K \
+        ABORT,${DL_DIR},100M,1K \
+        ABORT,${SSTATE_DIR},100M,1K \
+        ABORT,/tmp,10M,1K"
+
+    nvidia: |
+      NVIDIA_DEVNET_MIRROR = "file:///${TOPDIR}/../jetpack"
